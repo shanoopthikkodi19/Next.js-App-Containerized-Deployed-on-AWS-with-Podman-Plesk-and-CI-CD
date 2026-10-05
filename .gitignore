@@ -1,0 +1,31 @@
+/node_modules
+/.pnpm-store
+/jspm_packages
+
+# Next.js Build Outputs
+.next
+.git
+/out/
+/build/
+temp/
+
+# Docker & Containerization Artifacts
+.dockerignore
+# (Optional: uncomment below if you don't want to commit docker logs)
+# *.log
+
+# Debugging and System Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.eslintcache
+
+# Local Environment Variables
+# Block all local secrets, but allow tracking the safe placeholder example file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
