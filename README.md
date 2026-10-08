@@ -2,7 +2,7 @@
 
 A Next.js application packaged as a production Docker image, built automatically with **GitHub Actions**, published to **GitHub Container Registry (GHCR)**, and served on an **AWS EC2 (Red Hat Enterprise Linux 9)** server using **Podman** behind an **nginx reverse proxy managed by Plesk**.
 
-**Live site:** http://shanoop.in
+**Live site:** https://shanoop.in
 
 ---
 
