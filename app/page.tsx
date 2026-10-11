@@ -57,7 +57,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
           <a href="#home" className="text-lg font-extrabold tracking-tight">
-            CLYDE.
+            SHANOOP.
           </a>
           <ul className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[13px] font-medium">
             {nav.map((item) => (
@@ -87,7 +87,7 @@ export default function Home() {
                 We design &amp; build brands
               </p>
               <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">
-                Hi, I am <span className="text-sage-dark">Clyde</span>. This is my favorite work.
+                Hi, I am <span className="text-sage-dark">Shanoop</span>. This is my favorite work.
               </h1>
               <div className="mt-8 flex gap-3">
                 <a href="#contact" className="rounded bg-sage px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-sage-dark">
