@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "My Docker App",
-  description: "Next.js running in Docker",
+  title: "Yellow Fin",
+  description: "Tours & Travels",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

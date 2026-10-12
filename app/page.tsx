@@ -1,40 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { display, body } from "./fonts";
+import { SiteHeader, SiteFooter } from "./components/SiteChrome";
+import { BRAND } from "./site-data";
 
-const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700", "800"] });
-const body = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 /* ---------- EDIT THESE ---------- */
-const BRAND = {
-  name: "Yellow Fin",
-  suffix: "Tours & Travels",
-  phone: "+91 00000 00000", // shown in header/footer
-  whatsapp: "910000000000", // country code + number, no + or spaces
-  email: "hello@yellowfintours.in",
-  address: "Port Blair, Andaman & Nicobar Islands",
-};
-
-type NavItem = { label: string; href: string; children?: { label: string; href: string }[] };
-
-const NAV: NavItem[] = [
-  { label: "Group Packages", href: "/group-packages" },
-  { label: "Custom Packages", href: "/custom-packages" },
-  { label: "Holiday Packages", href: "/holiday-packages" },
-  { label: "Office Tour", href: "/office-tour" },
-  {
-    label: "Speciality Tours",
-    href: "/speciality-tours",
-    children: [
-      { label: "Student Tour", href: "/speciality-tours/student" },
-      { label: "Onam Tour", href: "/speciality-tours/onam" },
-      { label: "Vishu Tour", href: "/speciality-tours/vishu" },
-      { label: "New Year Tour", href: "/speciality-tours/new-year" },
-    ],
-  },
-];
-
 const FILTERS = ["All", "Honeymoon", "Family", "Group", "Custom", "Holiday", "Office", "Student", "Onam", "Vishu", "New Year"];
 
 type Pkg = { cat: string; title: string; href: string; length: string; route: string; blurb: string; tone: number };
@@ -86,8 +58,6 @@ function HeroArt() {
 }
 
 export default function Home() {
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [mobileNav, setMobileNav] = useState(false);
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
   const [form, setForm] = useState({ name: "", phone: "", month: "", interest: "Honeymoon Package" });
@@ -104,79 +74,7 @@ export default function Home() {
 
   return (
     <div className={`yf-page ${body.className}`} style={{ ["--display" as string]: display.style.fontFamily }}>
-      {/* ---------- Header ---------- */}
-      <header className="yf-header">
-        <div className="yf-topbar">
-          <span>{BRAND.address}</span>
-          <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a>
-        </div>
-
-        <div className="yf-brand-row">
-          <a href="/" className="yf-logo" aria-label="Yellow Fin Tours and Travels home">
-            <span className="yf-logo-mark" aria-hidden="true">
-              <svg viewBox="0 0 40 40"><path d="M8 32 C12 20 22 10 34 6 C31 14 28 22 28 32Z" fill="#0A2E36" /></svg>
-            </span>
-            <span className="yf-logo-text">
-              <strong className="yf-display">{BRAND.name}</strong>
-              <small>{BRAND.suffix}</small>
-            </span>
-          </a>
-
-          <label className="yf-search">
-            <span className="yf-sr-only">Search packages</span>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder='Search for "Havelock"'
-            />
-          </label>
-
-          <div className="yf-quick">
-            <a href="/honeymoon-package"><strong>Honeymoon Package</strong><small>Island escapes for two</small></a>
-            <a href="/family-packages"><strong>Family Packages</strong><small>Easy pace, all ages</small></a>
-          </div>
-
-          <button className="yf-burger" aria-expanded={mobileNav} aria-controls="main-nav" onClick={() => setMobileNav((v) => !v)}>
-            {mobileNav ? "Close" : "Menu"}
-          </button>
-        </div>
-
-        <nav id="main-nav" className={`yf-nav ${mobileNav ? "yf-nav-open" : ""}`} aria-label="Main">
-          <ul>
-            {NAV.map((item) => (
-              <li
-                key={item.label}
-                onMouseEnter={() => item.children && setOpenMenu(item.label)}
-                onMouseLeave={() => setOpenMenu(null)}
-              >
-                {item.children ? (
-                  <>
-                    <button
-                      aria-haspopup="true"
-                      aria-expanded={openMenu === item.label}
-                      onClick={() => setOpenMenu(openMenu === item.label ? null : item.label)}
-                    >
-                      {item.label} <span aria-hidden="true" className="yf-caret" />
-                    </button>
-                    {openMenu === item.label && (
-                      <ul className="yf-dropdown">
-                        <li><a href={item.href}>All speciality tours</a></li>
-                        {item.children.map((c) => (
-                          <li key={c.label}><a href={c.href}>{c.label}</a></li>
-                        ))}
-                      </ul>
-                    )}
-                  </>
-                ) : (
-                  <a href={item.href}>{item.label}</a>
-                )}
-              </li>
-            ))}
-          </ul>
-          <a href="#enquire" className="yf-expert">Book with Expert</a>
-        </nav>
-      </header>
+      <SiteHeader query={query} onQuery={setQuery} />
 
       <main>
         {/* ---------- Hero ---------- */}
@@ -306,22 +204,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* ---------- Footer ---------- */}
-      <footer className="yf-footer">
-        <div>
-          <strong className="yf-display">{BRAND.name} {BRAND.suffix}</strong>
-          <p>{BRAND.address}</p>
-        </div>
-        <div>
-          <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a>
-          <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>
-        </div>
-        <div>
-          {NAV.map((n) => (
-            <a key={n.label} href={n.href}>{n.label}</a>
-          ))}
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
