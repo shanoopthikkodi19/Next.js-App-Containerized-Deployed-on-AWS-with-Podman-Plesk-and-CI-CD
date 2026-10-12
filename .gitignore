@@ -1,28 +1,27 @@
+# Dependencies
 /node_modules
 /.pnpm-store
 /jspm_packages
 
-# Next.js Build Outputs
-.next
-.git
+# Next.js build outputs
+/.next/
 /out/
 /build/
+next-env.d.ts
+*.tsbuildinfo
 temp/
 
-# Docker & Containerization Artifacts
-.dockerignore
-# (Optional: uncomment below if you don't want to commit docker logs)
-# *.log
-
-# Debugging and System Logs
+# Logs and caches
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .eslintcache
 
-# Local Environment Variables
-# Block all local secrets, but allow tracking the safe placeholder example file
+# OS files
+.DS_Store
+
+# Local environment variables
 .env
 .env.local
 .env.development.local
