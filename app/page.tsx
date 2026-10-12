@@ -1,212 +1,327 @@
-const nav = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
-  { label: "Services", href: "#services" },
-  { label: "Contact", href: "#contact" },
-];
+"use client";
 
-const stats = [
-  { value: "750", label: "Projects complete" },
-  { value: "568", label: "Happy clients" },
-  { value: "478", label: "Cups of coffee" },
-  { value: "780", label: "Years experienced" },
-];
+import { useMemo, useState } from "react";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 
-const skills = [
-  { name: "Brand identity", level: 95 },
-  { name: "Web design", level: 90 },
-  { name: "Next.js / React", level: 85 },
-  { name: "Docker & Linux", level: 75 },
-];
+const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700", "800"] });
+const body = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
-const services = [
+/* ---------- EDIT THESE ---------- */
+const BRAND = {
+  name: "Yellow Fin",
+  suffix: "Tours & Travels",
+  phone: "+91 00000 00000", // shown in header/footer
+  whatsapp: "910000000000", // country code + number, no + or spaces
+  email: "hello@yellowfintours.in",
+  address: "Port Blair, Andaman & Nicobar Islands",
+};
+
+type NavItem = { label: string; href: string; children?: { label: string; href: string }[] };
+
+const NAV: NavItem[] = [
+  { label: "Group Packages", href: "/group-packages" },
+  { label: "Custom Packages", href: "/custom-packages" },
+  { label: "Holiday Packages", href: "/holiday-packages" },
+  { label: "Office Tour", href: "/office-tour" },
   {
-    title: "Brand design",
-    text: "Logos, color systems and guidelines that make your business easy to recognise.",
-  },
-  {
-    title: "Web development",
-    text: "Fast, responsive websites built with Next.js and deployed in containers.",
-  },
-  {
-    title: "UI/UX design",
-    text: "Clear interfaces and flows, tested with real users before launch.",
-  },
-  {
-    title: "Hosting & deployment",
-    text: "Docker setups on AlmaLinux with repeatable builds and simple updates.",
+    label: "Speciality Tours",
+    href: "/speciality-tours",
+    children: [
+      { label: "Student Tour", href: "/speciality-tours/student" },
+      { label: "Onam Tour", href: "/speciality-tours/onam" },
+      { label: "Vishu Tour", href: "/speciality-tours/vishu" },
+      { label: "New Year Tour", href: "/speciality-tours/new-year" },
+    ],
   },
 ];
 
-function Icon() {
+const FILTERS = ["All", "Honeymoon", "Family", "Group", "Custom", "Holiday", "Office", "Student", "Onam", "Vishu", "New Year"];
+
+type Pkg = { cat: string; title: string; href: string; length: string; route: string; blurb: string; tone: number };
+
+// Sample content: replace durations, routes and wording with your real itineraries.
+const PACKAGES: Pkg[] = [
+  { cat: "Honeymoon", title: "Honeymoon Package", href: "/honeymoon-package", length: "5 nights, 6 days", route: "Port Blair, Havelock, Neil", blurb: "Private beach time at Radhanagar, candlelight dinners and unhurried days for two.", tone: 0 },
+  { cat: "Family", title: "Family Packages", href: "/family-packages", length: "6 nights, 7 days", route: "Port Blair, Havelock, Neil", blurb: "Easy pacing, short transfers and stays that suit children and grandparents alike.", tone: 1 },
+  { cat: "Group", title: "Group Packages", href: "/group-packages", length: "5 to 7 days", route: "Fixed departures", blurb: "Join a scheduled group with a tour manager, or book a private group of friends.", tone: 2 },
+  { cat: "Custom", title: "Custom Packages", href: "/custom-packages", length: "You decide", route: "Any island, any pace", blurb: "Tell us the dates, budget and interests. We build the itinerary around you.", tone: 3 },
+  { cat: "Holiday", title: "Holiday Packages", href: "/holiday-packages", length: "4 to 8 days", route: "Port Blair, Havelock, Neil", blurb: "Ready-made island holidays with hotels, ferries and sightseeing already sorted.", tone: 4 },
+  { cat: "Office", title: "Office Tour", href: "/office-tour", length: "4 to 6 days", route: "Port Blair, Havelock", blurb: "Team outings with meeting-friendly venues, group activities and one invoice.", tone: 5 },
+  { cat: "Student", title: "Student Tour", href: "/speciality-tours/student", length: "4 to 6 days", route: "Port Blair, Ross, Baratang", blurb: "Educational trips covering history, mangroves and marine life, with teacher-friendly pricing.", tone: 1 },
+  { cat: "Onam", title: "Onam Tour", href: "/speciality-tours/onam", length: "5 days", route: "Port Blair, Havelock", blurb: "Spend the Onam holidays on the islands with a sadya-style festive lunch.", tone: 2 },
+  { cat: "Vishu", title: "Vishu Tour", href: "/speciality-tours/vishu", length: "5 days", route: "Port Blair, Havelock", blurb: "Mark Vishu by the sea with a family-friendly programme and festive meals.", tone: 0 },
+  { cat: "New Year", title: "New Year Tour", href: "/speciality-tours/new-year", length: "5 to 6 days", route: "Havelock, Neil", blurb: "Welcome the year on a quiet beach. Book early, hotels fill up fast.", tone: 3 },
+];
+
+const PLACES = [
+  { name: "Port Blair", note: "Cellular Jail, museums and the arrival point for most trips." },
+  { name: "Havelock (Swaraj Dweep)", note: "Radhanagar Beach, scuba diving and snorkelling." },
+  { name: "Neil (Shaheed Dweep)", note: "Bharatpur Beach, Natural Bridge and slow island cycling." },
+  { name: "Ross and North Bay", note: "Colonial ruins and coral-lined shores, a short boat ride away." },
+  { name: "Baratang", note: "Limestone caves and a mangrove creek by boat." },
+  { name: "Diglipur", note: "Saddle Peak, turtle beaches and a quieter north." },
+];
+
+// Sample reviews: swap for real customer feedback before going live.
+const REVIEWS = [
+  { name: "Guest name", trip: "Honeymoon Package", text: "Replace this with a real review from a honeymoon guest." },
+  { name: "Guest name", trip: "Family Packages", text: "Replace this with a real review from a family traveller." },
+  { name: "Guest name", trip: "Onam Tour", text: "Replace this with a real review from a festival group." },
+];
+/* -------------------------------- */
+
+function HeroArt() {
   return (
-    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sage text-white">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <rect x="3" y="7" width="18" height="13" rx="2" />
-        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-      </svg>
-    </span>
+    <svg className="yf-hero-art" viewBox="0 0 640 420" role="img" aria-label="A yellowfin fin cutting through the sea">
+      <circle cx="470" cy="110" r="64" fill="#F5B700" opacity="0.95" />
+      <path d="M0 250 C90 225 150 270 240 250 S400 225 480 250 S600 270 640 245 V420 H0Z" fill="#136B78" />
+      <path d="M0 290 C80 270 160 310 250 290 S410 268 490 292 S600 310 640 288 V420 H0Z" fill="#0E525E" />
+      <path d="M0 335 C100 318 170 352 270 335 S420 316 510 338 S600 350 640 334 V420 H0Z" fill="#0A3A44" />
+      {/* yellowfin dorsal fin */}
+      <path d="M268 262 C282 214 318 176 372 150 C362 186 352 224 352 262Z" fill="#F5B700" />
+      <path d="M352 262 C356 244 372 232 396 228 C386 240 380 252 380 262Z" fill="#E0A400" />
+      <path d="M236 270 C280 258 340 258 420 270" stroke="#CFEDEA" strokeWidth="3" fill="none" opacity="0.7" />
+    </svg>
   );
 }
 
 export default function Home() {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileNav, setMobileNav] = useState(false);
+  const [filter, setFilter] = useState("All");
+  const [query, setQuery] = useState("");
+  const [form, setForm] = useState({ name: "", phone: "", month: "", interest: "Honeymoon Package" });
+
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return PACKAGES.filter((p) => (filter === "All" || p.cat === filter) && (!q || `${p.title} ${p.route} ${p.blurb}`.toLowerCase().includes(q)));
+  }, [filter, query]);
+
+  const waLink = useMemo(() => {
+    const msg = `Hi Yellow Fin Tours, I'm ${form.name || "(name)"}. I'd like to enquire about the ${form.interest}${form.month ? ` for ${form.month}` : ""}. My number is ${form.phone || "(phone)"}.`;
+    return `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(msg)}`;
+  }, [form]);
+
   return (
-    <>
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <a href="#home" className="text-lg font-extrabold tracking-tight">
-            SHANOOP.
+    <div className={`yf-page ${body.className}`} style={{ ["--display" as string]: display.style.fontFamily }}>
+      {/* ---------- Header ---------- */}
+      <header className="yf-header">
+        <div className="yf-topbar">
+          <span>{BRAND.address}</span>
+          <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a>
+        </div>
+
+        <div className="yf-brand-row">
+          <a href="/" className="yf-logo" aria-label="Yellow Fin Tours and Travels home">
+            <span className="yf-logo-mark" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><path d="M8 32 C12 20 22 10 34 6 C31 14 28 22 28 32Z" fill="#0A2E36" /></svg>
+            </span>
+            <span className="yf-logo-text">
+              <strong className="yf-display">{BRAND.name}</strong>
+              <small>{BRAND.suffix}</small>
+            </span>
           </a>
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[13px] font-medium">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} className="py-1 transition-colors hover:text-sage-dark">
-                  {item.label}
-                </a>
+
+          <label className="yf-search">
+            <span className="yf-sr-only">Search packages</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder='Search for "Havelock"'
+            />
+          </label>
+
+          <div className="yf-quick">
+            <a href="/honeymoon-package"><strong>Honeymoon Package</strong><small>Island escapes for two</small></a>
+            <a href="/family-packages"><strong>Family Packages</strong><small>Easy pace, all ages</small></a>
+          </div>
+
+          <button className="yf-burger" aria-expanded={mobileNav} aria-controls="main-nav" onClick={() => setMobileNav((v) => !v)}>
+            {mobileNav ? "Close" : "Menu"}
+          </button>
+        </div>
+
+        <nav id="main-nav" className={`yf-nav ${mobileNav ? "yf-nav-open" : ""}`} aria-label="Main">
+          <ul>
+            {NAV.map((item) => (
+              <li
+                key={item.label}
+                onMouseEnter={() => item.children && setOpenMenu(item.label)}
+                onMouseLeave={() => setOpenMenu(null)}
+              >
+                {item.children ? (
+                  <>
+                    <button
+                      aria-haspopup="true"
+                      aria-expanded={openMenu === item.label}
+                      onClick={() => setOpenMenu(openMenu === item.label ? null : item.label)}
+                    >
+                      {item.label} <span aria-hidden="true" className="yf-caret" />
+                    </button>
+                    {openMenu === item.label && (
+                      <ul className="yf-dropdown">
+                        <li><a href={item.href}>All speciality tours</a></li>
+                        {item.children.map((c) => (
+                          <li key={c.label}><a href={c.href}>{c.label}</a></li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <a href={item.href}>{item.label}</a>
+                )}
               </li>
             ))}
           </ul>
+          <a href="#enquire" className="yf-expert">Book with Expert</a>
         </nav>
       </header>
 
       <main>
-        {/* Home / Hero */}
-        <section id="home" className="relative overflow-hidden bg-white">
-          <div className="hero-panel absolute inset-y-0 right-0 hidden w-[62%] bg-panel md:block" aria-hidden="true">
-            <svg viewBox="0 0 400 500" className="absolute bottom-0 right-[8%] h-[92%] text-foreground/80" fill="currentColor">
-              <circle cx="200" cy="130" r="62" />
-              <path d="M60 500c0-110 50-190 140-190s140 80 140 190z" />
-            </svg>
-          </div>
-
-          <div className="relative mx-auto flex min-h-[28rem] max-w-6xl items-center px-6 py-16 md:min-h-[34rem]">
-            <div className="max-w-md">
-              <p className="mb-4 text-xs font-semibold tracking-widest text-sage-dark">
-                We design &amp; build brands
-              </p>
-              <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">
-                Hi, I am <span className="text-sage-dark">Shanoop</span>. This is my favorite work.
-              </h1>
-              <div className="mt-8 flex gap-3">
-                <a href="#contact" className="rounded bg-sage px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-sage-dark">
-                  Hire me
-                </a>
-                <a href="#" className="rounded border border-neutral-300 bg-white px-5 py-2 text-xs font-semibold transition-colors hover:border-sage-dark">
-                  Download CV
-                </a>
-              </div>
+        {/* ---------- Hero ---------- */}
+        <section className="yf-hero">
+          <div className="yf-hero-copy">
+            <h1 className="yf-display">Island holidays, planned on the islands.</h1>
+            <p>
+              Yellow Fin Tours and Travels arranges stays, ferries, sightseeing and activities across the
+              Andaman and Nicobar Islands, for couples, families, offices, schools and groups.
+            </p>
+            <div className="yf-hero-actions">
+              <a href="#packages" className="yf-btn-primary">See packages</a>
+              <a href="#enquire" className="yf-btn-ghost">Plan my trip</a>
             </div>
           </div>
+          <HeroArt />
         </section>
 
-        {/* Stats */}
-        <section className="bg-surface">
-          <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
-            {stats.map((s) => (
-              <li key={s.label} className="flex items-center gap-4">
-                <Icon />
-                <div>
-                  <p className="text-2xl font-bold leading-none">{s.value}</p>
-                  <p className="mt-1 text-[11px] font-medium text-sage-dark">{s.label}</p>
-                </div>
+        {/* ---------- Packages ---------- */}
+        <section id="packages" className="yf-section">
+          <div className="yf-section-head">
+            <h2 className="yf-display">Choose how you want to travel</h2>
+            <p>Pick a type of trip. Every package can be adjusted to your dates and budget.</p>
+          </div>
+
+          <div className="yf-chips" role="tablist" aria-label="Package type">
+            {FILTERS.map((f) => (
+              <button
+                key={f}
+                role="tab"
+                aria-selected={filter === f}
+                className={filter === f ? "yf-chip-on" : "yf-chip"}
+                onClick={() => setFilter(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {shown.length === 0 ? (
+            <p className="yf-empty">
+              No package matches "{query}". Clear the search, or <a href="#enquire">ask us for a custom plan</a>.
+            </p>
+          ) : (
+            <ul className="yf-grid">
+              {shown.map((p) => (
+                <li key={p.title} className="yf-card">
+                  {/* Replace this block with <Image src="/packages/xyz.jpg" ... /> when you have photos */}
+                  <div className={`yf-photo yf-tone${p.tone}`}>
+                    <span>{p.cat}</span>
+                  </div>
+                  <div className="yf-card-body">
+                    <h3 className="yf-display">{p.title}</h3>
+                    <p className="yf-meta">{p.length} &mdash; {p.route}</p>
+                    <p>{p.blurb}</p>
+                    <a href={p.href} className="yf-link">View details</a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* ---------- Places ---------- */}
+        <section className={`yf-section yf-places`}>
+          <div className="yf-section-head">
+            <h2 className="yf-display">Where we take you</h2>
+          </div>
+          <ul className="yf-place-list">
+            {PLACES.map((p) => (
+              <li key={p.name}>
+                <h3 className="yf-display">{p.name}</h3>
+                <p>{p.note}</p>
               </li>
             ))}
           </ul>
         </section>
 
-        {/* About */}
-        <section id="about" className="bg-white py-20">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-2">
-            <div className="flex aspect-[4/3] items-end justify-center overflow-hidden bg-panel" aria-hidden="true">
-              <svg viewBox="0 0 400 300" className="h-[85%] text-foreground/80" fill="currentColor">
-                <circle cx="200" cy="90" r="50" />
-                <path d="M80 300c0-90 50-150 120-150s120 60 120 150z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold">About me</h2>
-              <p className="mt-4 max-w-prose leading-relaxed text-muted">
-                I am a designer and developer who helps small businesses build a brand people remember. I
-                handle everything from the first sketch to the live website, and I keep each project simple,
-                fast and easy to maintain.
-              </p>
-              <p className="mt-4 max-w-prose leading-relaxed text-muted">
-                When I am not designing, I am usually tinkering with containers, servers and a strong cup of coffee.
-              </p>
-              <a href="#contact" className="mt-6 inline-block rounded bg-sage px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-sage-dark">
-                Work with me
-              </a>
-            </div>
+        {/* ---------- Reviews ---------- */}
+        <section className="yf-section">
+          <div className="yf-section-head">
+            <h2 className="yf-display">What our travellers say</h2>
+            <p>Customer satisfaction is our main goal.</p>
           </div>
+          <ul className="yf-reviews">
+            {REVIEWS.map((r, i) => (
+              <li key={i}>
+                <p className="yf-stars" aria-label="5 out of 5">★★★★★ <span>5.0</span></p>
+                <p>{r.text}</p>
+                <p className="yf-who"><strong>{r.name}</strong>, {r.trip}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
-        {/* Skills */}
-        <section id="skills" className="bg-surface py-20">
-          <div className="mx-auto max-w-6xl px-6">
-            <h2 className="text-3xl font-bold">Skills</h2>
-            <ul className="mt-10 grid gap-8 md:grid-cols-2">
-              {skills.map((s) => (
-                <li key={s.name}>
-                  <div className="mb-2 flex justify-between text-sm font-medium">
-                    <span>{s.name}</span>
-                    <span className="text-sage-dark">{s.level}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-neutral-200">
-                    <div className="h-2 rounded-full bg-sage" style={{ width: `${s.level}%` }} />
-                  </div>
-                </li>
-              ))}
-            </ul>
+        {/* ---------- Enquiry ---------- */}
+        <section id="enquire" className="yf-enquire">
+          <div>
+            <h2 className="yf-display">Talk to a trip expert</h2>
+            <p>Share a few details and we will reply on WhatsApp with options and a quote.</p>
           </div>
-        </section>
-
-        {/* Services */}
-        <section id="services" className="bg-white py-20">
-          <div className="mx-auto max-w-6xl px-6">
-            <h2 className="text-3xl font-bold">Services</h2>
-            <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {services.map((s) => (
-                <li key={s.title} className="rounded-lg border border-neutral-200 p-6 transition-colors hover:border-sage">
-                  <Icon />
-                  <h3 className="mt-5 text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{s.text}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section id="contact" className="bg-surface py-20">
-          <div className="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-bold">Contact us</h2>
-              <p className="mt-4 max-w-prose leading-relaxed text-muted">
-                Tell me about your project and I will reply within two working days.
-              </p>
-              <p className="mt-6 text-sm">
-                <a href="mailto:hello@clyde.example" className="font-medium text-sage-dark hover:underline">
-                  hr@shanoop.in
-                </a>
-              </p>
-            </div>
-            <form action="mailto:hello@clyde.example" method="post" encType="text/plain" className="space-y-4">
-              <input name="name" type="text" required placeholder="Your name" className="w-full rounded border border-neutral-300 bg-white px-4 py-3 text-sm" />
-              <input name="email" type="email" required placeholder="Your email" className="w-full rounded border border-neutral-300 bg-white px-4 py-3 text-sm" />
-              <textarea name="message" required rows={4} placeholder="Your message" className="w-full rounded border border-neutral-300 bg-white px-4 py-3 text-sm" />
-              <button type="submit" className="rounded bg-sage px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-sage-dark">
-                Send message
-              </button>
-            </form>
+          <div className="yf-form">
+            <label>
+              Your name
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoComplete="name" />
+            </label>
+            <label>
+              Phone number
+              <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} inputMode="tel" autoComplete="tel" />
+            </label>
+            <label>
+              Travel month
+              <input value={form.month} onChange={(e) => setForm({ ...form, month: e.target.value })} placeholder="e.g. December" />
+            </label>
+            <label>
+              Trip type
+              <select value={form.interest} onChange={(e) => setForm({ ...form, interest: e.target.value })}>
+                {PACKAGES.map((p) => (
+                  <option key={p.title}>{p.title}</option>
+                ))}
+              </select>
+            </label>
+            <a className="yf-btn-primary" href={waLink} target="_blank" rel="noopener noreferrer">
+              Send on WhatsApp
+            </a>
           </div>
         </section>
       </main>
 
-      <footer className="bg-white py-8 text-center text-xs text-muted">
-        © {new Date().getFullYear()} Clyde. All rights reserved.
+      {/* ---------- Footer ---------- */}
+      <footer className="yf-footer">
+        <div>
+          <strong className="yf-display">{BRAND.name} {BRAND.suffix}</strong>
+          <p>{BRAND.address}</p>
+        </div>
+        <div>
+          <a href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a>
+          <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>
+        </div>
+        <div>
+          {NAV.map((n) => (
+            <a key={n.label} href={n.href}>{n.label}</a>
+          ))}
+        </div>
       </footer>
-    </>
+    </div>
   );
 }
