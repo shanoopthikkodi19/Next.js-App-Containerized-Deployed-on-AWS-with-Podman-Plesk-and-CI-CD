@@ -42,21 +42,6 @@ const REVIEWS = [
 ];
 /* -------------------------------- */
 
-function HeroArt() {
-  return (
-    <svg className="yf-hero-art" viewBox="0 0 640 420" role="img" aria-label="A yellowfin fin cutting through the sea">
-      <circle cx="470" cy="110" r="64" fill="#F5B700" opacity="0.95" />
-      <path d="M0 250 C90 225 150 270 240 250 S400 225 480 250 S600 270 640 245 V420 H0Z" fill="#136B78" />
-      <path d="M0 290 C80 270 160 310 250 290 S410 268 490 292 S600 310 640 288 V420 H0Z" fill="#0E525E" />
-      <path d="M0 335 C100 318 170 352 270 335 S420 316 510 338 S600 350 640 334 V420 H0Z" fill="#0A3A44" />
-      {/* yellowfin dorsal fin */}
-      <path d="M268 262 C282 214 318 176 372 150 C362 186 352 224 352 262Z" fill="#F5B700" />
-      <path d="M352 262 C356 244 372 232 396 228 C386 240 380 252 380 262Z" fill="#E0A400" />
-      <path d="M236 270 C280 258 340 258 420 270" stroke="#CFEDEA" strokeWidth="3" fill="none" opacity="0.7" />
-    </svg>
-  );
-}
-
 export default function Home() {
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
@@ -90,7 +75,6 @@ export default function Home() {
               <a href="#enquire" className="yf-btn-ghost">Plan my trip</a>
             </div>
           </div>
-          <HeroArt />
         </section>
 
         {/* ---------- Packages ---------- */}

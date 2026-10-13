@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { BRAND, NAV, tel } from "../site-data";
 
 type HeaderProps = {
@@ -27,9 +28,7 @@ export function SiteHeader({ current, query = "", onQuery }: HeaderProps) {
 
       <div className="yf-brand-row">
         <a href="/" className="yf-logo" aria-label="Yellow Fin Tours and Travels home">
-          <span className="yf-logo-mark" aria-hidden="true">
-            <svg viewBox="0 0 40 40"><path d="M8 32 C12 20 22 10 34 6 C31 14 28 22 28 32Z" fill="#0A2E36" /></svg>
-          </span>
+          <Image src="/logo.png" alt="" width={112} height={112} priority className="yf-logo-img" />
           <span className="yf-logo-text">
             <strong className="yf-display">{BRAND.name}</strong>
             <small>{BRAND.suffix}</small>

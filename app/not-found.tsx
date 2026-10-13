@@ -18,13 +18,7 @@ export default function NotFound() {
       <SiteHeader />
 
       <main className="yf-soon">
-        <svg className="yf-soon-art" viewBox="0 0 640 220" role="img" aria-label="A yellowfin fin cutting through the sea">
-          <circle cx="470" cy="70" r="46" fill="#F5B700" />
-          <path d="M0 120 C90 100 150 140 240 120 S400 100 480 122 S600 140 640 118 V220 H0Z" fill="#136B78" />
-          <path d="M0 160 C80 142 160 180 250 160 S410 140 490 162 S600 180 640 158 V220 H0Z" fill="#0E525E" />
-          <path d="M268 132 C282 92 318 62 372 40 C362 72 352 102 352 132Z" fill="#F5B700" />
-          <path d="M352 132 C356 116 372 106 396 102 C386 112 380 122 380 132Z" fill="#E0A400" />
-        </svg>
+        <div className="yf-soon-art" role="img" aria-label="A quiet Andaman beach" />
 
         <div className="yf-soon-copy">
           <p className="yf-soon-tag">Coming soon</p>
